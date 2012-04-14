@@ -27,7 +27,9 @@ import org.springframework.security.access.vote.AuthenticatedVoter
 import org.springframework.security.access.vote.RoleVoter
 import org.springframework.security.web.FilterInvocation
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
-import org.springframework.security.web.util.AntUrlPathMatcher
+//import org.springframework.security.web.util.AntUrlPathMatcher
+
+import org.springframework.security.web.util.AntPathRequestMatcher
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -45,7 +47,7 @@ class InterceptUrlMapFilterInvocationDefinitionTests extends GroovyTestCase {
 	protected void setUp() {
 		super.setUp()
 		ReflectionUtils.application = _application
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 	}
 
 	void testAfterPropertiesSet() {
@@ -55,7 +57,7 @@ class InterceptUrlMapFilterInvocationDefinitionTests extends GroovyTestCase {
 			_fid.afterPropertiesSet()
 		}
 
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		_fid.afterPropertiesSet()
 	}
@@ -118,7 +120,7 @@ class InterceptUrlMapFilterInvocationDefinitionTests extends GroovyTestCase {
 		def chain = new MockFilterChain()
 		FilterInvocation filterInvocation = new FilterInvocation(request, response, chain)
 
-		def matcher = new AntUrlPathMatcher()
+		def matcher = new AntPathRequestMatcher("/**")
 		MockInterceptUrlMapFilterInvocationDefinition fid
 
 		def initializeFid = {

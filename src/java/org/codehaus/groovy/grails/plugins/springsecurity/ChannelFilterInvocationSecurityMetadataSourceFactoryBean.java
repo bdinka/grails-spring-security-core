@@ -25,7 +25,11 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.RequestKey;
-import org.springframework.security.web.util.UrlMatcher;
+import org.springframework.security.web.util.RegexRequestMatcher;
+//import org.springframework.security.web.util.UrlMatcher;
+
+import org.springframework.security.web.util.RequestMatcher;
+
 import org.springframework.util.Assert;
 
 /**
@@ -36,7 +40,7 @@ import org.springframework.util.Assert;
 public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
        implements FactoryBean<FilterInvocationSecurityMetadataSource>, InitializingBean {
 
-	private UrlMatcher _urlMatcher;
+	private RequestMatcher _urlMatcher;
 	private Map<String, String> _definition;
 	private DefaultFilterInvocationSecurityMetadataSource _source;
 
@@ -72,11 +76,13 @@ public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
 		Assert.notNull(_definition, "definition map is required");
 		Assert.notNull(_urlMatcher, "urlMatcher is required");
 
-		_source = new DefaultFilterInvocationSecurityMetadataSource(_urlMatcher, buildMap());
+		_source = new DefaultFilterInvocationSecurityMetadataSource(buildMap());
 	}
 
-	protected LinkedHashMap<RequestKey, Collection<ConfigAttribute>> buildMap() {
-		LinkedHashMap<RequestKey, Collection<ConfigAttribute>> map = new LinkedHashMap<RequestKey, Collection<ConfigAttribute>>();
+	protected  LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> buildMap() {
+        LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>> map =
+                                new LinkedHashMap<RequestMatcher, Collection<ConfigAttribute>>();
+
 		for (Map.Entry<String, String> entry : _definition.entrySet()) {
 			String value = entry.getValue();
 			if (value == null) {
@@ -91,7 +97,7 @@ public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
 						"' must be one of REQUIRES_SECURE_CHANNEL, REQUIRES_INSECURE_CHANNEL, or ANY_CHANNEL");
 			}
 
-			map.put(new RequestKey(entry.getKey()),
+			map.put(new RegexRequestMatcher(entry.getKey(), null),
 					SecurityConfig.createSingleAttributeList(value));
 		}
 		return map;
@@ -102,7 +108,7 @@ public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
 	 *
 	 * @param urlMatcher
 	 */
-	public void setUrlMatcher(final UrlMatcher urlMatcher) {
+	public void setUrlMatcher(final RequestMatcher urlMatcher) {
 		_urlMatcher = urlMatcher;
 	}
 

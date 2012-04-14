@@ -36,10 +36,18 @@ import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.WebSecurityExpressionHandler;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.util.AntUrlPathMatcher;
-import org.springframework.security.web.util.UrlMatcher;
+
+//import org.springframework.security.web.util.AntUrlPathMatcher;
+//import org.springframework.security.web.util.UrlMatcher;
+
+import org.springframework.security.web.util.RequestMatcher;
+import org.springframework.security.web.util.AntPathRequestMatcher;
+
 import org.springframework.util.Assert;
 import org.springframework.util.StringUtils;
+import org.springframework.util.PathMatcher;
+import org.springframework.util.AntPathMatcher;
+
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -47,12 +55,14 @@ import org.springframework.util.StringUtils;
 public abstract class AbstractFilterInvocationDefinition
        implements FilterInvocationSecurityMetadataSource, InitializingBean {
 
-	private UrlMatcher _urlMatcher;
+	private RequestMatcher _urlMatcher;
 	private boolean _rejectIfNoRule;
 	private boolean _stripQueryStringFromUrls = true;
 	private RoleVoter _roleVoter;
 	private AuthenticatedVoter _authenticatedVoter;
 	private WebSecurityExpressionHandler _expressionHandler;
+
+    private final PathMatcher pathMatcher = new AntPathMatcher();
 
 	private final Map<Object, Collection<ConfigAttribute>> _compiled = new LinkedHashMap<Object, Collection<ConfigAttribute>>();
 
@@ -111,9 +121,13 @@ public abstract class AbstractFilterInvocationDefinition
 		boolean stopAtFirstMatch = stopAtFirstMatch();
 		for (Map.Entry<Object, Collection<ConfigAttribute>> entry : _compiled.entrySet()) {
 			Object pattern = entry.getKey();
-			if (_urlMatcher.pathMatchesUrl(pattern, url)) {
+            boolean isMatch = pathMatcher.match((String)pattern, url);
+
+			if (isMatch) {
 				// TODO this assumes Ant matching, not valid for regex
-				if (configAttributes == null || _urlMatcher.pathMatchesUrl(configAttributePattern, (String)pattern)) {
+               isMatch = pathMatcher.match((String)configAttributePattern, (String)pattern);
+
+				if (configAttributes == null || isMatch) {
 					configAttributes = entry.getValue();
 					configAttributePattern = pattern;
 					if (_log.isTraceEnabled()) {
@@ -175,9 +189,9 @@ public abstract class AbstractFilterInvocationDefinition
 	 * Dependency injection for the url matcher.
 	 * @param urlMatcher the matcher
 	 */
-	public void setUrlMatcher(final UrlMatcher urlMatcher) {
+	public void setUrlMatcher(final RequestMatcher urlMatcher) {
 		_urlMatcher = urlMatcher;
-		_stripQueryStringFromUrls = _urlMatcher instanceof AntUrlPathMatcher;
+		_stripQueryStringFromUrls = _urlMatcher instanceof AntPathRequestMatcher;
 	}
 
 	/**
@@ -192,9 +206,9 @@ public abstract class AbstractFilterInvocationDefinition
 
 		String fixed = url;
 
-		if (getUrlMatcher().requiresLowerCaseUrl()) {
+		//if (getUrlMatcher().requiresLowerCaseUrl()) {
 			fixed = fixed.toLowerCase();
-		}
+		//}
 
 		if (_stripQueryStringFromUrls) {
 			int firstQuestionMarkIndex = fixed.indexOf("?");
@@ -206,10 +220,17 @@ public abstract class AbstractFilterInvocationDefinition
 		return fixed;
 	}
 
-	protected UrlMatcher getUrlMatcher() {
+	protected RequestMatcher getUrlMatcher() {
 		return _urlMatcher;
 	}
 
+
+    protected RequestMatcher getUrlMatcher(final String pattern) {
+        _urlMatcher = new AntPathRequestMatcher(pattern);
+        return _urlMatcher;
+    }
+    
+    
 	/**
 	 * For debugging.
 	 * @return an unmodifiable map of {@link AnnotationFilterInvocationDefinition}ConfigAttributeDefinition
@@ -239,7 +260,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 	protected void compileAndStoreMapping(final String pattern, final List<String> tokens) {
 
-		Object key = getUrlMatcher().compile(pattern);
+		Object key = ((AntPathRequestMatcher)getUrlMatcher(pattern)).getPattern();
 
 		Collection<ConfigAttribute> configAttributes = buildConfigAttributes(tokens);
 
@@ -291,7 +312,9 @@ public abstract class AbstractFilterInvocationDefinition
 	 */
 	public Collection<ConfigAttribute> findMatchingAttributes(final String url) {
 		for (Map.Entry<Object, Collection<ConfigAttribute>> entry : _compiled.entrySet()) {
-			if (_urlMatcher.pathMatchesUrl(entry.getKey(), url)) {
+            boolean isMatch = pathMatcher.match((String)entry.getKey(), url);
+
+			if (isMatch) {
 				return entry.getValue();
 			}
 		}

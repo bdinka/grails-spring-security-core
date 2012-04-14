@@ -36,6 +36,8 @@ import org.springframework.util.Assert;
  */
 public class AjaxAwareAccessDeniedHandler implements AccessDeniedHandler, InitializingBean {
 
+    private static final String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
+
 	private String errorPage;
 	private String ajaxErrorPage;
 	private PortResolver portResolver;
@@ -53,7 +55,7 @@ public class AjaxAwareAccessDeniedHandler implements AccessDeniedHandler, Initia
 		if (e != null && isLoggedIn() && authenticationTrustResolver.isRememberMe(getAuthentication())) {
 			// user has a cookie but is getting bounced because of IS_AUTHENTICATED_FULLY,
 			// so Acegi won't save the original request
-			request.getSession().setAttribute(WebAttributes.SAVED_REQUEST, new DefaultSavedRequest(request, portResolver));
+			request.getSession().setAttribute(SAVED_REQUEST, new DefaultSavedRequest(request, portResolver));
 		}
 
 		if (response.isCommitted()) {

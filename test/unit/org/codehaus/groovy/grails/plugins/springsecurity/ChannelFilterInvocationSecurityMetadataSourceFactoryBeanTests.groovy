@@ -15,7 +15,9 @@
 package org.codehaus.groovy.grails.plugins.springsecurity
 
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource
-import org.springframework.security.web.util.AntUrlPathMatcher
+//import org.springframework.security.web.util.AntUrlPathMatcher
+
+import org.springframework.security.web.util.AntPathRequestMatcher
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -37,7 +39,7 @@ class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends Groo
 			_factory.afterPropertiesSet()
 		}
 
-		_factory.urlMatcher = new AntUrlPathMatcher()
+		_factory.urlMatcher = new AntPathRequestMatcher("/**")
 		shouldFail(IllegalArgumentException) {
 			_factory.afterPropertiesSet()
 		}
@@ -52,7 +54,7 @@ class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends Groo
 	}
 
 	void testGetObject() {
-		_factory.urlMatcher = new AntUrlPathMatcher()
+		_factory.urlMatcher = new AntPathRequestMatcher("/**")
 		_factory.definition = ['/foo1/**': 'REQUIRES_SECURE_CHANNEL',
 		                       '/foo2/**': 'REQUIRES_INSECURE_CHANNEL',
 		                       '/foo3/**': 'ANY_CHANNEL']

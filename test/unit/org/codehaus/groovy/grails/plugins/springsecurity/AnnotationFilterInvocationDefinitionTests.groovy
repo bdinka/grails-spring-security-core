@@ -38,7 +38,10 @@ import org.springframework.security.access.vote.AuthenticatedVoter
 import org.springframework.security.access.vote.RoleVoter
 import org.springframework.security.web.FilterInvocation
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
-import org.springframework.security.web.util.AntUrlPathMatcher
+//import org.springframework.security.web.util.AntUrlPathMatcher
+
+import org.springframework.security.web.util.AntPathRequestMatcher
+
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -72,7 +75,7 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 //	}
 
 	void testLowercaseAndStripQuerystring() {
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		assertEquals '/foo/bar', _fid.lowercaseAndStripQuerystring('/foo/BAR')
 		assertEquals '/foo/bar', _fid.lowercaseAndStripQuerystring('/foo/bar')
@@ -97,7 +100,7 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 		def chain = new MockFilterChain()
 		FilterInvocation filterInvocation = new FilterInvocation(request, response, chain)
 
-		def matcher = new AntUrlPathMatcher()
+		def matcher = new AntPathRequestMatcher("/**")
 
 		_fid = new MockAnnotationFilterInvocationDefinition()
 		_fid.urlMatcher = matcher
@@ -139,7 +142,7 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 		request.requestURI = 'requestURI'
 
 		_fid = new MockAnnotationFilterInvocationDefinition()
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		def urlMappingsHolder = [matchAll: { String uri -> [] as UrlMappingInfo[] }] as UrlMappingsHolder
 		_fid.initialize [:], urlMappingsHolder, [] as GrailsClass[]
@@ -159,7 +162,7 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 
 		_fid = new MockAnnotationFilterInvocationDefinition(
 			url: 'FOO?x=1', application: _application,
-			urlMatcher: new AntUrlPathMatcher())
+			urlMatcher: new AntPathRequestMatcher("/**"))
 
 		UrlMappingInfo[] mappings = [[getControllerName: { -> 'foo' },
 		                              getActionName: { -> 'bar' },
@@ -208,7 +211,7 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 		GrailsClass[] controllerClasses = [new DefaultGrailsControllerClass(ClassAnnotatedController),
 		                                   new DefaultGrailsControllerClass(MethodAnnotatedController)]
 
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 		_fid.roleVoter = new RoleVoter()
 		_fid.authenticatedVoter = new AuthenticatedVoter()
 		_fid.expressionHandler = new DefaultWebSecurityExpressionHandler()

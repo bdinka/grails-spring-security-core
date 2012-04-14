@@ -31,7 +31,7 @@ import org.springframework.util.Assert;
  *
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
  */
-public class WebExpressionVoter implements AccessDecisionVoter {
+public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation> {
 
 	private WebSecurityExpressionHandler _expressionHandler;
 
@@ -40,7 +40,7 @@ public class WebExpressionVoter implements AccessDecisionVoter {
 	 * @see org.springframework.security.access.AccessDecisionVoter#vote(
 	 * 	org.springframework.security.core.Authentication, java.lang.Object, java.util.Collection)
 	 */
-	public int vote(final Authentication authentication, final Object object,
+	public int vote(final Authentication authentication, final FilterInvocation object,
 			final Collection<ConfigAttribute> attributes) {
 
 		Assert.notNull(authentication, "authentication cannot be null");
@@ -52,7 +52,7 @@ public class WebExpressionVoter implements AccessDecisionVoter {
 			return ACCESS_ABSTAIN;
 		}
 
-		FilterInvocation fi = (FilterInvocation)object;
+		FilterInvocation fi = object;
 		EvaluationContext ctx = _expressionHandler.createEvaluationContext(authentication, fi);
 
 		return ExpressionUtils.evaluateAsBoolean(weca.getAuthorizeExpression(), ctx) ?

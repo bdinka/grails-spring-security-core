@@ -24,7 +24,9 @@ import org.springframework.security.access.vote.AuthenticatedVoter
 import org.springframework.security.access.vote.RoleVoter
 import org.springframework.security.web.FilterInvocation
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
-import org.springframework.security.web.util.AntUrlPathMatcher
+//import org.springframework.security.web.util.AntUrlPathMatcher
+
+import org.springframework.security.web.util.AntPathRequestMatcher
 
 /**
  * Unit tests for RequestmapFilterInvocationDefinition.
@@ -87,13 +89,13 @@ class RequestmapFilterInvocationDefinitionTests extends GrailsUnitTestCase {
 			_fid.afterPropertiesSet()
 		}
 
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		_fid.afterPropertiesSet()
 	}
 
 	void testStoreMapping() {
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		assertEquals 0, _fid.configAttributeMap.size()
 
@@ -109,7 +111,7 @@ class RequestmapFilterInvocationDefinitionTests extends GrailsUnitTestCase {
 
 	void testReset() {
 		_fid = new TestRequestmapFilterInvocationDefinition()
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 		_fid.roleVoter = new RoleVoter()
 		_fid.authenticatedVoter = new AuthenticatedVoter()
 		_fid.expressionHandler = new DefaultWebSecurityExpressionHandler()
@@ -123,7 +125,7 @@ class RequestmapFilterInvocationDefinitionTests extends GrailsUnitTestCase {
 
 	void testInitialize() {
 		_fid = new TestRequestmapFilterInvocationDefinition()
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 		_fid.roleVoter = new RoleVoter()
 		_fid.authenticatedVoter = new AuthenticatedVoter()
 		_fid.expressionHandler = new DefaultWebSecurityExpressionHandler()
@@ -140,7 +142,7 @@ class RequestmapFilterInvocationDefinitionTests extends GrailsUnitTestCase {
 	}
 
 	void testDetermineUrl() {
-		_fid.urlMatcher = new AntUrlPathMatcher()
+		_fid.urlMatcher = new AntPathRequestMatcher("/**")
 
 		def request = new MockHttpServletRequest()
 		def response = new MockHttpServletResponse()

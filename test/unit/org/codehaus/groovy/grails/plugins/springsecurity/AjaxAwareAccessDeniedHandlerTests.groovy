@@ -31,6 +31,8 @@ class AjaxAwareAccessDeniedHandlerTests extends GroovyTestCase {
 	private final _handler = new AjaxAwareAccessDeniedHandler()
 	private final _application = new FakeApplication()
 
+    private static String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST_KEY";
+
 	/**
 	 * {@inheritDoc}
 	 * @see junit.framework.TestCase#setUp()
@@ -52,9 +54,9 @@ class AjaxAwareAccessDeniedHandlerTests extends GroovyTestCase {
 
 		SCH.context.authentication = new RememberMeAuthenticationToken('username', 'password', null)
 
-		assertNull request.session.getAttribute(DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY)
+		assertNull request.session.getAttribute(SAVED_REQUEST)
 		_handler.handle request, response, new AccessDeniedException('fail')
-		assertNotNull request.session.getAttribute(DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY)
+		assertNotNull request.session.getAttribute(SAVED_REQUEST)
 
 		assertEquals 'http://localhost/fail', response.redirectedUrl
 	}

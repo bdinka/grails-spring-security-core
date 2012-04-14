@@ -35,6 +35,8 @@ class SpringSecurityUtilsTests extends GroovyTestCase {
 
 	private final application = new FakeApplication()
 
+    private static String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST_KEY";
+
 	/**
 	 * {@inheritDoc}
 	 * @see junit.framework.TestCase#setUp()
@@ -157,7 +159,7 @@ class SpringSecurityUtilsTests extends GroovyTestCase {
 
 		def request = new MockHttpServletRequest()
 		def savedRequest = new DefaultSavedRequest(request, new PortResolverImpl())
-		request.session.setAttribute(DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY, savedRequest)
+		request.session.setAttribute(SAVED_REQUEST, savedRequest)
 
 		assertFalse SpringSecurityUtils.isAjax(request)
 	}
@@ -167,7 +169,7 @@ class SpringSecurityUtilsTests extends GroovyTestCase {
 		def request = new MockHttpServletRequest()
 		request.addHeader 'X-Requested-With', 'true'
 		def savedRequest = new DefaultSavedRequest(request, new PortResolverImpl())
-		request.session.setAttribute(DefaultSavedRequest.SPRING_SECURITY_SAVED_REQUEST_KEY, savedRequest)
+		request.session.setAttribute(SAVED_REQUEST, savedRequest)
 
 		assertTrue SpringSecurityUtils.isAjax(request)
 	}
