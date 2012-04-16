@@ -104,7 +104,6 @@ import org.codehaus.groovy.grails.plugins.springsecurity.RequestHolderAuthentica
 import org.codehaus.groovy.grails.plugins.springsecurity.ReflectionUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityEventListener
 import org.codehaus.groovy.grails.plugins.springsecurity.SecurityFilterPosition
-import org.codehaus.groovy.grails.plugins.springsecurity.SecurityRequestHolder
 import org.codehaus.groovy.grails.plugins.springsecurity.SpringSecurityUtils
 import org.codehaus.groovy.grails.plugins.springsecurity.WebExpressionVoter
 
