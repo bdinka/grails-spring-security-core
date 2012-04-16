@@ -34,12 +34,8 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.access.vote.AuthenticatedVoter;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.web.FilterInvocation;
-import org.springframework.security.web.access.expression.WebSecurityExpressionHandler;
+import org.springframework.security.access.expression.AbstractSecurityExpressionHandler;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-
-//import org.springframework.security.web.util.AntUrlPathMatcher;
-//import org.springframework.security.web.util.UrlMatcher;
-
 import org.springframework.security.web.util.RequestMatcher;
 import org.springframework.security.web.util.AntPathRequestMatcher;
 
@@ -60,7 +56,7 @@ public abstract class AbstractFilterInvocationDefinition
 	private boolean _stripQueryStringFromUrls = true;
 	private RoleVoter _roleVoter;
 	private AuthenticatedVoter _authenticatedVoter;
-	private WebSecurityExpressionHandler _expressionHandler;
+	private AbstractSecurityExpressionHandler _expressionHandler;
 
     private final PathMatcher pathMatcher = new AntPathMatcher();
 
@@ -89,12 +85,15 @@ public abstract class AbstractFilterInvocationDefinition
 
 		String url = determineUrl(filterInvocation);
 
-		Collection<ConfigAttribute> configAttributes;
+        assert url != null  && url.length() > 0;
+
+		Collection<ConfigAttribute> configAttributes = null;
 		try {
 			configAttributes = findConfigAttributes(url);
 		}
 		catch (Exception e) {
 			// TODO fix this
+            e.printStackTrace();
 			throw new RuntimeException(e);
 		}
 
@@ -125,7 +124,7 @@ public abstract class AbstractFilterInvocationDefinition
 
 			if (isMatch) {
 				// TODO this assumes Ant matching, not valid for regex
-               isMatch = pathMatcher.match((String)configAttributePattern, (String)pattern);
+               //isMatch = pathMatcher.match((String)configAttributePattern, (String)pattern);
 
 				if (configAttributes == null || isMatch) {
 					configAttributes = entry.getValue();
@@ -348,10 +347,10 @@ public abstract class AbstractFilterInvocationDefinition
 	 * Dependency injection for the expression handler.
 	 * @param handler the handler
 	 */
-	public void setExpressionHandler(final WebSecurityExpressionHandler handler) {
+	public void setExpressionHandler(final AbstractSecurityExpressionHandler handler) {
 		_expressionHandler = handler;
 	}
-	protected WebSecurityExpressionHandler getExpressionHandler() {
+	protected AbstractSecurityExpressionHandler getExpressionHandler() {
 		return _expressionHandler;
 	}
 

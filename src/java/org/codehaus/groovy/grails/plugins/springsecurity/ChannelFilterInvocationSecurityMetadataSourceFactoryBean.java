@@ -97,8 +97,8 @@ public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
 						"' must be one of REQUIRES_SECURE_CHANNEL, REQUIRES_INSECURE_CHANNEL, or ANY_CHANNEL");
 			}
 
-			map.put(new RegexRequestMatcher(entry.getKey(), null),
-					SecurityConfig.createSingleAttributeList(value));
+			map.put(new RegexRequestMatcher(entry.getKey(), null, true),
+					SecurityConfig.createList(value));
 		}
 		return map;
 	}

@@ -76,12 +76,8 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.security.web.session.HttpSessionEventPublisher
-//import org.springframework.security.web.util.AntUrlPathMatcher
-//import org.springframework.security.web.util.RegexUrlPathMatcher
-
 import org.springframework.security.web.util.RegexRequestMatcher
 import org.springframework.security.web.util.AntPathRequestMatcher
-
 import org.springframework.web.filter.DelegatingFilterProxy
 
 import org.codehaus.groovy.grails.plugins.springsecurity.AjaxAwareAccessDeniedHandler
@@ -596,7 +592,8 @@ to default to 'Annotation'; setting value to 'Annotation'
 			}
 		}
 		else {
-			filterChainMap[filterChain.matcher.universalMatchPattern] = new ArrayList(allConfiguredFilters.values()) // /**
+            RegexRequestMatcher matcher = new RegexRequestMatcher("/\\**", null, true)
+			filterChainMap[matcher] = new ArrayList(allConfiguredFilters.values()) // /**
 		}
 
 		filterChain.filterChainMap = filterChainMap
@@ -813,8 +810,6 @@ to default to 'Annotation'; setting value to 'Annotation'
 	private configureFilterChain = { conf ->
 		springSecurityFilterChain(FilterChainProxy) {
 			filterChainMap = [:] // will be set in doWithApplicationContext
-			stripQueryStringFromUrls = conf.filterChain.stripQueryStringFromUrls // true
-			matcher = new AntPathRequestMatcher("/**")// make into bean
 		}
 	}
 
@@ -987,12 +982,11 @@ to default to 'Annotation'; setting value to 'Annotation'
 		}
 
 		authenticationDetailsSource(WebAuthenticationDetailsSource) {
-			clazz = conf.authenticationDetails.authClass // WebAuthenticationDetails
+
 		}
 
 		requestCache(HttpSessionRequestCache) {
 			portResolver = ref('portResolver')
-			justUseSavedRequestOnGet = conf.requestCache.onlyOnGet // false
 			createSessionAllowed = conf.requestCache.createSession // true
 		}
 

@@ -38,10 +38,7 @@ import org.springframework.security.access.vote.AuthenticatedVoter
 import org.springframework.security.access.vote.RoleVoter
 import org.springframework.security.web.FilterInvocation
 import org.springframework.security.web.access.expression.DefaultWebSecurityExpressionHandler
-//import org.springframework.security.web.util.AntUrlPathMatcher
-
 import org.springframework.security.web.util.AntPathRequestMatcher
-
 import org.springframework.web.context.WebApplicationContext
 import org.springframework.web.context.request.RequestContextHolder
 
@@ -100,7 +97,8 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 		def chain = new MockFilterChain()
 		FilterInvocation filterInvocation = new FilterInvocation(request, response, chain)
 
-		def matcher = new AntPathRequestMatcher("/**")
+        String pattern = '/foo/**'
+		def matcher = new AntPathRequestMatcher(pattern)
 
 		_fid = new MockAnnotationFilterInvocationDefinition()
 		_fid.urlMatcher = matcher
@@ -109,12 +107,14 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 		_fid.initialize [:], urlMappingsHolder, [] as GrailsClass[]
 		WebUtils.storeGrailsWebRequest new GrailsWebRequest(request, response, new MockServletContext())
 
-		String pattern = '/foo/**'
+
 		def configAttribute = [new SecurityConfig('ROLE_ADMIN')]
-		_fid.storeMapping matcher.compile(pattern), configAttribute
+
+		_fid.storeMapping matcher.getPattern(), configAttribute
 
 		request.requestURI = '/foo/bar'
 		_fid.url = request.requestURI
+
 		assertEquals configAttribute, _fid.getAttributes(filterInvocation)
 
 		_fid.rejectIfNoRule = false
@@ -127,7 +127,10 @@ class AnnotationFilterInvocationDefinitionTests extends GroovyTestCase {
 
 		String moreSpecificPattern = '/foo/ba*'
 		def moreSpecificConfigAttribute = [new SecurityConfig('ROLE_SUPERADMIN')]
-		_fid.storeMapping matcher.compile(moreSpecificPattern), moreSpecificConfigAttribute
+
+        matcher = new AntPathRequestMatcher(moreSpecificPattern)
+
+		_fid.storeMapping matcher.getPattern(), moreSpecificConfigAttribute
 
 		request.requestURI = '/foo/bar'
 		_fid.url = request.requestURI

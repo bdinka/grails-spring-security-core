@@ -23,6 +23,7 @@ import org.springframework.security.access.expression.ExpressionUtils;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.expression.WebSecurityExpressionHandler;
+import org.springframework.security.access.expression.SecurityExpressionHandler;
 import org.springframework.util.Assert;
 
 /**
@@ -33,7 +34,7 @@ import org.springframework.util.Assert;
  */
 public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation> {
 
-	private WebSecurityExpressionHandler _expressionHandler;
+	private SecurityExpressionHandler _expressionHandler;
 
 	/**
 	 * {@inheritDoc}
@@ -89,7 +90,7 @@ public class WebExpressionVoter implements AccessDecisionVoter<FilterInvocation>
 	 * Dependency injection for the expression handler.
 	 * @param expressionHandler the handler
 	 */
-	public void setExpressionHandler(final WebSecurityExpressionHandler expressionHandler) {
+	public void setExpressionHandler(final SecurityExpressionHandler expressionHandler) {
 		_expressionHandler = expressionHandler;
 	}
 }

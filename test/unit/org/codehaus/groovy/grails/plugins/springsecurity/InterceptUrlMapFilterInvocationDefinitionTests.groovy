@@ -139,22 +139,27 @@ class InterceptUrlMapFilterInvocationDefinitionTests extends GroovyTestCase {
 		def configAttribute = [new SecurityConfig('ROLE_ADMIN'), new SecurityConfig('ROLE_SUPERUSER')]
 		def moreSpecificConfigAttribute = [new SecurityConfig('ROLE_SUPERUSER')]
 		fid = initializeFid()
-		fid.storeMapping matcher.compile('/secure/**'), configAttribute
-		fid.storeMapping matcher.compile('/secure/reallysecure/**'), moreSpecificConfigAttribute
+		fid.storeMapping '/secure/**', configAttribute
+		fid.storeMapping '/secure/reallysecure/**', moreSpecificConfigAttribute
 		checkConfigAttributeForUrl(configAttribute, '/secure/reallysecure/list')
 		checkConfigAttributeForUrl(configAttribute, '/secure/list')
 
 		fid = initializeFid()
-		fid.storeMapping matcher.compile('/secure/reallysecure/**'), moreSpecificConfigAttribute
-		fid.storeMapping matcher.compile('/secure/**'), configAttribute
+		fid.storeMapping '/secure/reallysecure/**', moreSpecificConfigAttribute
+		fid.storeMapping '/secure/**', configAttribute
 		checkConfigAttributeForUrl(moreSpecificConfigAttribute, '/secure/reallysecure/list')
 		checkConfigAttributeForUrl(configAttribute, '/secure/list')
 
 		fid = initializeFid()
 		configAttribute = [new SecurityConfig('IS_AUTHENTICATED_FULLY')]
 		moreSpecificConfigAttribute = [new SecurityConfig('IS_AUTHENTICATED_ANONYMOUSLY')]
-		fid.storeMapping matcher.compile('/unprotected/**'), moreSpecificConfigAttribute
-		fid.storeMapping matcher.compile('/**/*.jsp'), configAttribute
+
+        matcher = new AntPathRequestMatcher('/unprotected/**')
+		fid.storeMapping matcher.getPattern(), moreSpecificConfigAttribute
+
+        matcher = new AntPathRequestMatcher('/**/*.jsp')
+		fid.storeMapping matcher.getPattern(), configAttribute
+
 		checkConfigAttributeForUrl(moreSpecificConfigAttribute, '/unprotected/b.jsp')
 		checkConfigAttributeForUrl(moreSpecificConfigAttribute, '/unprotected/path')
 		checkConfigAttributeForUrl(moreSpecificConfigAttribute, '/unprotected/path/x.jsp')

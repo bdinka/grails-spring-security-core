@@ -15,9 +15,12 @@
 package org.codehaus.groovy.grails.plugins.springsecurity
 
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource
-//import org.springframework.security.web.util.AntUrlPathMatcher
-
+import org.springframework.security.web.util.RequestMatcher
+import org.springframework.security.web.util.RegexRequestMatcher
 import org.springframework.security.web.util.AntPathRequestMatcher
+import org.springframework.security.access.ConfigAttribute;
+import org.springframework.security.access.SecurityConfig;
+import org.springframework.mock.web.MockHttpServletRequest
 
 /**
  * @author <a href='mailto:burt@burtbeckwith.com'>Burt Beckwith</a>
@@ -25,6 +28,9 @@ import org.springframework.security.web.util.AntPathRequestMatcher
 class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends GroovyTestCase {
 
 	private _factory = new ChannelFilterInvocationSecurityMetadataSourceFactoryBean()
+
+    private static final int entrySetSize = 3
+    private static final int configAttributeIndex = 0
 
 	void testGetObjectType() {
 		assertSame DefaultFilterInvocationSecurityMetadataSource, _factory.objectType
@@ -44,27 +50,86 @@ class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends Groo
 			_factory.afterPropertiesSet()
 		}
 
-		_factory.definition = ['/foo1/**': 'secure_only']
+		_factory.definition = ["/foo1/\\**" : "secure_only:"]
+        
 		shouldFail(IllegalArgumentException) {
 			_factory.afterPropertiesSet()
 		}
 
-		_factory.definition = ['/foo1/**': 'REQUIRES_SECURE_CHANNEL']
+		_factory.definition = ["/foo1/\\**": "REQUIRES_SECURE_CHANNEL"]
 		_factory.afterPropertiesSet()
 	}
 
 	void testGetObject() {
+        String patternFoo1 = "/foo1/**"
+        String patternFoo2 = "/foo2/**"
+        String patternFoo3 = "/foo3/**"
+
 		_factory.urlMatcher = new AntPathRequestMatcher("/**")
-		_factory.definition = ['/foo1/**': 'REQUIRES_SECURE_CHANNEL',
-		                       '/foo2/**': 'REQUIRES_INSECURE_CHANNEL',
-		                       '/foo3/**': 'ANY_CHANNEL']
+		_factory.definition = ["/foo1/\\**": 'REQUIRES_SECURE_CHANNEL',
+                               "/foo2/\\**": 'REQUIRES_INSECURE_CHANNEL',
+                               "/foo3/\\**": 'ANY_CHANNEL']
 		_factory.afterPropertiesSet()
 
 		def object = _factory.object
+
+        System.out.println("The object is: " + object)
+
 		assertTrue object instanceof DefaultFilterInvocationSecurityMetadataSource
-		def map = object.@httpMethodMap
-		assertEquals 'REQUIRES_SECURE_CHANNEL',   map.get(null).get('/foo1/**').attribute[0]
-		assertEquals 'REQUIRES_INSECURE_CHANNEL', map.get(null).get('/foo2/**').attribute[0]
-		assertEquals 'ANY_CHANNEL',               map.get(null).get('/foo3/**').attribute[0]
+		def map = object.@requestMap
+        
+        System.out.println("The contents of the mpa are: " + map)
+
+        assertTrue !map.isEmpty()
+        assertNotNull map.entrySet()
+        assertEquals map.entrySet().size(), entrySetSize
+
+        boolean isFoundMatch = false;
+
+        def mockHttpServletRequestFoo1 = new MockHttpServletRequest();
+        mockHttpServletRequestFoo1.setServletPath(patternFoo1)
+        mockHttpServletRequestFoo1.setPathInfo(null)
+        mockHttpServletRequestFoo1.setQueryString(null)
+
+
+        def mockHttpServletRequestFoo2 = new MockHttpServletRequest();
+        mockHttpServletRequestFoo2.setServletPath(patternFoo2)
+        mockHttpServletRequestFoo2.setPathInfo(null)
+        mockHttpServletRequestFoo2.setQueryString(null)
+
+        def mockHttpServletRequestFoo3 = new MockHttpServletRequest();
+        mockHttpServletRequestFoo3.setServletPath(patternFoo3)
+        mockHttpServletRequestFoo3.setPathInfo(null)
+        mockHttpServletRequestFoo3.setQueryString(null)
+
+        for (Map.Entry<RequestMatcher, Collection<ConfigAttribute>> entry : map.entrySet()) {
+            RequestMatcher rp = entry.getKey()
+            Collection<ConfigAttribute> value = map.get(rp)
+
+            assertNotNull value
+
+            List<ConfigAttribute> valueList = (List<ConfigAttribute>) value;
+            ConfigAttribute configAttribute = valueList.get(configAttributeIndex)
+
+            String attribute = configAttribute.getAttribute()
+
+            if(rp.matches(mockHttpServletRequestFoo1))  {
+               assertEquals 'REQUIRES_SECURE_CHANNEL',  attribute
+
+               isFoundMatch = true
+            }  else if (rp.matches(mockHttpServletRequestFoo2)) {
+                assertEquals 'REQUIRES_INSECURE_CHANNEL', attribute
+
+                isFoundMatch = true
+            }  else if (rp.matches(mockHttpServletRequestFoo3)) {
+                assertEquals 'ANY_CHANNEL', attribute
+
+                isFoundMatch = true
+            }
+
+            assertTrue isFoundMatch
+
+            isFoundMatch = false;
+        }
 	}
 }

@@ -31,7 +31,7 @@ class AjaxAwareAccessDeniedHandlerTests extends GroovyTestCase {
 	private final _handler = new AjaxAwareAccessDeniedHandler()
 	private final _application = new FakeApplication()
 
-    private static String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST_KEY";
+    private static String SAVED_REQUEST = "SPRING_SECURITY_SAVED_REQUEST";
 
 	/**
 	 * {@inheritDoc}
