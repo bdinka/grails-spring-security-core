@@ -333,7 +333,7 @@ to default to 'Annotation'; setting value to 'Annotation'
 					urlMatcher = new AntPathRequestMatcher("/**")
 				}
 				else {
-					urlMatcher = new RegexRequestMatcher("/**", null)
+					urlMatcher = new RegexRequestMatcher("/.*", null)
 				}
 				if (conf.rejectIfNoRule instanceof Boolean) {
 					rejectIfNoRule = conf.rejectIfNoRule
@@ -591,7 +591,7 @@ to default to 'Annotation'; setting value to 'Annotation'
 			}
 		}
 		else {
-            RegexRequestMatcher matcher = new RegexRequestMatcher("/\\**", null, true)
+            RegexRequestMatcher matcher = new RegexRequestMatcher("/.*", null, true)
 			filterChainMap[matcher] = new ArrayList(allConfiguredFilters.values()) // /**
 		}
 

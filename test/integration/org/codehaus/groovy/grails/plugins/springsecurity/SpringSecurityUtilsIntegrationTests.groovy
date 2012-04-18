@@ -30,7 +30,6 @@ import org.springframework.security.web.authentication.rememberme.RememberMeAuth
 import org.springframework.security.web.context.SecurityContextPersistenceFilter
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.security.web.util.RequestMatcher
-import org.springframework.security.web.util.RegexRequestMatcher
 import org.springframework.web.filter.GenericFilterBean
 
 import test.TestRole

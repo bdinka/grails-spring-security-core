@@ -468,7 +468,7 @@ public final class SpringSecurityUtils {
         Map<RequestMatcher, List<Filter>> matcherToFilterMap
                             = new  LinkedHashMap<RequestMatcher, List<Filter>>();
 
-        matcherToFilterMap.put(new RegexRequestMatcher("/**", null),
+        matcherToFilterMap.put(new RegexRequestMatcher("/.*", null, true),
                 new ArrayList<Filter>(getConfiguredOrderedFilters().values())) ;
         filterChain.setFilterChainMap(matcherToFilterMap);
 	}

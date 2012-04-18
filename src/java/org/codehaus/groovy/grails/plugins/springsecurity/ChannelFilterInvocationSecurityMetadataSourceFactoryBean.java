@@ -25,9 +25,7 @@ import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.access.intercept.RequestKey;
-import org.springframework.security.web.util.RegexRequestMatcher;
-//import org.springframework.security.web.util.UrlMatcher;
-
+import org.springframework.security.web.util.AntPathRequestMatcher;
 import org.springframework.security.web.util.RequestMatcher;
 
 import org.springframework.util.Assert;
@@ -97,7 +95,7 @@ public class ChannelFilterInvocationSecurityMetadataSourceFactoryBean
 						"' must be one of REQUIRES_SECURE_CHANNEL, REQUIRES_INSECURE_CHANNEL, or ANY_CHANNEL");
 			}
 
-			map.put(new RegexRequestMatcher(entry.getKey(), null, true),
+			map.put(new AntPathRequestMatcher(entry.getKey(), null),
 					SecurityConfig.createList(value));
 		}
 		return map;

@@ -16,7 +16,6 @@ package org.codehaus.groovy.grails.plugins.springsecurity
 
 import org.springframework.security.web.access.intercept.DefaultFilterInvocationSecurityMetadataSource
 import org.springframework.security.web.util.RequestMatcher
-import org.springframework.security.web.util.RegexRequestMatcher
 import org.springframework.security.web.util.AntPathRequestMatcher
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
@@ -50,13 +49,13 @@ class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends Groo
 			_factory.afterPropertiesSet()
 		}
 
-		_factory.definition = ["/foo1/\\**" : "secure_only:"]
+		_factory.definition = ["/foo1/**" : "secure_only:"]
         
 		shouldFail(IllegalArgumentException) {
 			_factory.afterPropertiesSet()
 		}
 
-		_factory.definition = ["/foo1/\\**": "REQUIRES_SECURE_CHANNEL"]
+		_factory.definition = ["/foo1/**": "REQUIRES_SECURE_CHANNEL"]
 		_factory.afterPropertiesSet()
 	}
 
@@ -66,9 +65,9 @@ class ChannelFilterInvocationSecurityMetadataSourceFactoryBeanTests extends Groo
         String patternFoo3 = "/foo3/**"
 
 		_factory.urlMatcher = new AntPathRequestMatcher("/**")
-		_factory.definition = ["/foo1/\\**": 'REQUIRES_SECURE_CHANNEL',
-                               "/foo2/\\**": 'REQUIRES_INSECURE_CHANNEL',
-                               "/foo3/\\**": 'ANY_CHANNEL']
+		_factory.definition = ["/foo1/**": 'REQUIRES_SECURE_CHANNEL',
+                               "/foo2/**": 'REQUIRES_INSECURE_CHANNEL',
+                               "/foo3/**": 'ANY_CHANNEL']
 		_factory.afterPropertiesSet()
 
 		def object = _factory.object
