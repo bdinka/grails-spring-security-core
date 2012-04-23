@@ -76,6 +76,7 @@ import org.springframework.security.web.context.SecurityContextPersistenceFilter
 import org.springframework.security.web.savedrequest.HttpSessionRequestCache
 import org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter
 import org.springframework.security.web.session.HttpSessionEventPublisher
+import org.springframework.security.web.util.RequestMatcher
 import org.springframework.security.web.util.RegexRequestMatcher
 import org.springframework.security.web.util.AntPathRequestMatcher
 import org.springframework.web.filter.DelegatingFilterProxy
@@ -333,7 +334,7 @@ to default to 'Annotation'; setting value to 'Annotation'
 					urlMatcher = new AntPathRequestMatcher("/**")
 				}
 				else {
-					urlMatcher = new RegexRequestMatcher("/.*", null)
+					urlMatcher = new RegexRequestMatcher("/.*", null, true)
 				}
 				if (conf.rejectIfNoRule instanceof Boolean) {
 					rejectIfNoRule = conf.rejectIfNoRule
@@ -551,7 +552,7 @@ to default to 'Annotation'; setting value to 'Annotation'
 
 		// build filters here to give dependent plugins a chance to register some
 		def filterChain = ctx.springSecurityFilterChain
-		Map<String, List<Filter>> filterChainMap = [:]
+		Map<RequestMatcher, List<Filter>> filterChainMap = [:]
 
 		SortedMap<Integer, String> filterNames = findFilterChainNames(conf)
 		def allConfiguredFilters = [:]
@@ -591,7 +592,7 @@ to default to 'Annotation'; setting value to 'Annotation'
 			}
 		}
 		else {
-            RegexRequestMatcher matcher = new RegexRequestMatcher("/.*", null, true)
+            AntPathRequestMatcher matcher = new AntPathRequestMatcher("/**")
 			filterChainMap[matcher] = new ArrayList(allConfiguredFilters.values()) // /**
 		}
 

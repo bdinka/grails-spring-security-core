@@ -58,7 +58,7 @@ import org.springframework.security.web.authentication.switchuser.SwitchUserGran
 import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
 import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.security.web.util.RequestMatcher;
-import org.springframework.security.web.util.RegexRequestMatcher;
+import org.springframework.security.web.util.AntPathRequestMatcher;
 import org.springframework.util.StringUtils;
 
 /**
@@ -468,7 +468,7 @@ public final class SpringSecurityUtils {
         Map<RequestMatcher, List<Filter>> matcherToFilterMap
                             = new  LinkedHashMap<RequestMatcher, List<Filter>>();
 
-        matcherToFilterMap.put(new RegexRequestMatcher("/.*", null, true),
+        matcherToFilterMap.put(new AntPathRequestMatcher("/**"),
                 new ArrayList<Filter>(getConfiguredOrderedFilters().values())) ;
         filterChain.setFilterChainMap(matcherToFilterMap);
 	}
